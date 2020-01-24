@@ -11,6 +11,58 @@ info:
 servers:
   - url: 'http://localhost:3000/v1'
 paths:
+  /auth/register:
+    post:
+      summary: Register locally
+      responses:
+        '200':
+          description: OK
+          headers:
+            token:
+              schema:
+                type: string
+              description: JWT token
+      description: Register user locally
+      operationId: registerLocal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './openapi.json#/components/schemas/User'
+        description: User
+      tags:
+        - auth
+  /auth/login:
+    post:
+      summary: Login locally
+      responses:
+        '200':
+          description: OK
+          headers:
+            token:
+              schema:
+                type: string
+              description: JWT token
+      description: Login user
+      operationId: loginLocal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './openapi.json#/components/schemas/User'
+        description: User
+      tags:
+        - auth
+  /auth/facebook:
+    get:
+      summary: Login Facebook
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+      description: Login Facebook
+      operationId: loginFacebook
   /students:
     post:
       summary: Create student account
@@ -78,7 +130,6 @@ paths:
                     type: string
       tags:
         - students
-
   '/students/{username}':
     get:
       summary: Get student profile
@@ -99,7 +150,6 @@ paths:
         required: true
         schema:
           type: string
-
   /projects:
     post:
       summary: Create project
@@ -126,7 +176,6 @@ paths:
               properties:
                 project:
                   $ref: '#/components/schemas/Project'
-
   '/projects/{projectId}':
     parameters:
       - name: projectId
@@ -188,7 +237,6 @@ paths:
       description: Delete project
       tags:
         - projects
-
   /projects/search:
     post:
       summary: Search project
@@ -208,7 +256,7 @@ paths:
       operationId: searchProject
       description: Search project
       requestBody:
-        description: Project
+        description: Project Filter
         content:
           application/json:
             schema:
@@ -220,7 +268,6 @@ paths:
                   type: integer
                 count:
                   type: integer
-
   /contracts:
     get:
       summary: Get student contracts
@@ -237,6 +284,7 @@ paths:
       operationId: getStudentContracts
       tags:
         - contracts
+      parameters: []
     post:
       summary: Create student contract
       responses:
@@ -250,7 +298,7 @@ paths:
                   contractId:
                     type: string
       requestBody:
-        description: Create student contract
+        description: Contract
         content:
           application/json:
             schema:
@@ -262,7 +310,6 @@ paths:
       operationId: createStudentContract
       tags:
         - contracts
-
   '/contracts/{contractId}':
     parameters:
       - name: contractId
@@ -295,89 +342,6 @@ paths:
       operationId: updateStudentContract
       tags:
         - contracts
-
-  # /npo:
-  #   post:
-  #     summary: Create NPO account
-  #     tags:
-  #       - npo
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: createNPO
-  #     description: Create NPO account
-
-  # '/npo/{npoId}':
-  #   parameters:
-  #     - name: npoId
-  #       in: path
-  #       required: true
-  #       schema:
-  #         type: string
-  #   get:
-  #     summary: Get NPO profile
-  #     tags:
-  #       - npo
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: getNPO
-  #     description: Get NPO profile
-  #   patch:
-  #     summary: Update NPO profile
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: updateNPO
-  #     description: Update NPO profile
-  #     tags:
-  #       - npo
-
-  # /clients:
-  #   post:
-  #     summary: Create client account
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: createClient
-  #     description: Create client account
-  #     tags:
-  #       - clients
-
-  # '/clients/{clientId}':
-  #   parameters:
-  #     - name: clientId
-  #       in: path
-  #       required: true
-  #       schema:
-  #         type: string
-  #   get:
-  #     summary: Get client profile
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: getClient
-  #     description: Get client profile
-  #     tags:
-  #       - clients
-  #   patch:
-  #     summary: Update client profile
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: updateClient
-  #     description: Update client profile
-  #     tags:
-  #       - clients
-  #   delete:
-  #     summary: Delete client account
-  #     responses:
-  #       '200':
-  #         description: OK
-  #     operationId: deleteClient
-  #     description: Delete client account
-  #     tags:
-  #       - clients
 components:
   schemas:
     User:
@@ -564,7 +528,3 @@ components:
           type: string
           format: uri
       description: Non-profit organization
-
-
-
-
