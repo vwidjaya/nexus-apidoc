@@ -11,6 +11,58 @@ info:
 servers:
   - url: 'http://localhost:3000/v1'
 paths:
+  /auth/register:
+    post:
+      summary: Register locally
+      responses:
+        '200':
+          description: OK
+          headers:
+            token:
+              schema:
+                type: string
+              description: JWT token
+      description: Register user locally
+      operationId: registerLocal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './openapi.json#/components/schemas/User'
+        description: User
+      tags:
+        - auth
+  /auth/login:
+    post:
+      summary: Login locally
+      responses:
+        '200':
+          description: OK
+          headers:
+            token:
+              schema:
+                type: string
+              description: JWT token
+      description: Login user
+      operationId: loginLocal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: './openapi.json#/components/schemas/User'
+        description: User
+      tags:
+        - auth
+  /auth/facebook:
+    get:
+      summary: Login Facebook
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+      description: Login Facebook
+      operationId: loginFacebook
   /students:
     post:
       summary: Create student account
@@ -204,7 +256,7 @@ paths:
       operationId: searchProject
       description: Search project
       requestBody:
-        description: Project
+        description: Project Filter
         content:
           application/json:
             schema:
@@ -232,6 +284,7 @@ paths:
       operationId: getStudentContracts
       tags:
         - contracts
+      parameters: []
     post:
       summary: Create student contract
       responses:
@@ -245,7 +298,7 @@ paths:
                   contractId:
                     type: string
       requestBody:
-        description: Create student contract
+        description: Contract
         content:
           application/json:
             schema:
