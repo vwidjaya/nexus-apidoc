@@ -28,7 +28,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './openapi.json#/components/schemas/User'
+              $ref: '#/components/schemas/User'
         description: User
       tags:
         - auth
@@ -49,11 +49,11 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './openapi.json#/components/schemas/User'
+              $ref: '#/components/schemas/User'
         description: User
       tags:
         - auth
-  /auth/facebook:
+  /auth/student/facebook:
     get:
       summary: Login Facebook
       tags:
@@ -87,7 +87,7 @@ paths:
               type: object
               properties:
                 student:
-                  $ref: '#/components/schemas/Student'
+                  $ref: '#/components/schemas/StudentProfile'
         description: Student
     patch:
       summary: Update student profile
