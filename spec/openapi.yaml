@@ -11,6 +11,28 @@ info:
 servers:
   - url: 'http://localhost:3000/v1'
 paths:
+  /verify:
+    get:
+      summary: Verify user auth status
+      responses:
+        '200':
+          description: OK
+          headers:
+            token:
+              schema:
+                type: string
+              description: JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
+      operationId: verifyAuth
+      description: Verify user auth status
+      tags:
+        - auth
   /auth/register:
     post:
       summary: Register locally
@@ -22,6 +44,13 @@ paths:
               schema:
                 type: string
               description: JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
       description: Register user locally
       operationId: registerLocal
       requestBody:
@@ -43,6 +72,13 @@ paths:
               schema:
                 type: string
               description: JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
       description: Login user
       operationId: loginLocal
       requestBody:
@@ -63,6 +99,7 @@ paths:
           description: OK
       description: Login Facebook
       operationId: loginFacebook
+
   /students:
     post:
       summary: Create student account
@@ -86,8 +123,13 @@ paths:
             schema:
               type: object
               properties:
-                student:
-                  $ref: '#/components/schemas/StudentProfile'
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                # $ref: '#/components/schemas/StudentProfile'
         description: Student
     patch:
       summary: Update student profile
@@ -111,8 +153,27 @@ paths:
             schema:
               type: object
               properties:
-                student:
-                  $ref: '#/components/schemas/Student'
+                profile:
+                  type: object
+                  properties:
+                    dob:
+                      type: string
+                      format: date
+                    school:
+                      type: string
+                    standing:
+                      type: string
+                    major1:
+                      type: string
+                    major2:
+                      type: string
+                    location:
+                      $ref: '#/components/schemas/Location'
+                skills:
+                  type: array
+                  items:
+                    type: string
+              # $ref: '#/components/schemas/Student'
         description: Student
     delete:
       summary: Delete student account
@@ -130,6 +191,7 @@ paths:
                     type: string
       tags:
         - students
+  
   '/students/{username}':
     get:
       summary: Get student profile
@@ -150,6 +212,7 @@ paths:
         required: true
         schema:
           type: string
+  
   /projects:
     post:
       summary: Create project
@@ -174,8 +237,35 @@ paths:
             schema:
               type: object
               properties:
-                project:
-                  $ref: '#/components/schemas/Project'
+                title:
+                  type: string
+                description:
+                  type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                # $ref: '#/components/schemas/Project'
+
+  /projects/owned:
+    get:
+      summary: Get projects owned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDetails'
+      operationId: getProjectsOwned
+      description: Get projects owned
+      tags:
+        - projects
+  
   '/projects/{projectId}':
     parameters:
       - name: projectId
@@ -184,7 +274,7 @@ paths:
         schema:
           type: string
     get:
-      summary: Get project details
+      summary: Get project
       tags:
         - projects
       responses:
@@ -195,7 +285,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Project'
       operationId: getProject
-      description: Get project details
+      description: Get project
     patch:
       summary: Update project details
       responses:
@@ -218,8 +308,33 @@ paths:
             schema:
               type: object
               properties:
-                project:
-                  $ref: '#/components/schemas/Project'
+                details:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    startDate:
+                      type: string
+                      format: date
+                    endDate:
+                      type: string
+                      format: date
+                    status:
+                      type: string
+                fields:
+                  type: array
+                  items:
+                    type: string
+                skills:
+                  type: array
+                  items:
+                    type: string
+                locations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Location'
         description: Project
     delete:
       summary: Delete project
@@ -237,6 +352,54 @@ paths:
       description: Delete project
       tags:
         - projects
+
+  '/projects/{projectId}/contracts':
+    get:
+      summary: Get project contracts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    contractId:
+                      type: string
+                    startDate:
+                      type: string
+                      format: date
+                    endDate:
+                      type: string
+                      format: date
+                    status:
+                      type: string
+                    student:
+                      type: object
+                      properties:
+                        firstName:
+                          type: string
+                        lastName:
+                          type: string
+                        user:
+                          type: object
+                          properties:
+                            username:
+                              type: string
+      operationId: getProjectContracts
+      description: Get project contracts
+      tags:
+        - projects
+        - contracts
+    parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+  
   /projects/search:
     post:
       summary: Search project
@@ -268,6 +431,7 @@ paths:
                   type: integer
                 count:
                   type: integer
+  
   /contracts:
     get:
       summary: Get student contracts
@@ -279,7 +443,25 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Contract'
+                  type: object
+                  properties:
+                    contractId:
+                      type: string
+                    project:
+                      type: object
+                      properties:
+                        projectId:
+                          type: string
+                        title:
+                          type: string
+                    startDate:
+                      type: string
+                      format: date
+                    endDate:
+                      type: string
+                      format: date
+                    status:
+                      type: string
       description: Get student contracts
       operationId: getStudentContracts
       tags:
@@ -304,12 +486,31 @@ paths:
             schema:
               type: object
               properties:
-                contract:
-                  $ref: '#/components/schemas/Contract'
+                project:
+                  type: object
+                  properties:
+                    projectId:
+                      type: string
+                student:
+                  type: object
+                  properties:
+                    user:
+                      type: object
+                      properties:
+                        username:
+                          type: string
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                # $ref: '#/components/schemas/Contract'
       description: Create student contract
       operationId: createStudentContract
       tags:
         - contracts
+  
   '/contracts/{contractId}':
     parameters:
       - name: contractId
@@ -335,13 +536,21 @@ paths:
             schema:
               type: object
               properties:
-                contract:
-                  $ref: '#/components/schemas/Contract'
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                status:
+                  type: string
+                # $ref: '#/components/schemas/Contract'
         description: Contract
       description: Update student contract
       operationId: updateStudentContract
       tags:
         - contracts
+
 components:
   schemas:
     User:
@@ -349,7 +558,7 @@ components:
       type: object
       description: User (parent of student/npo client)
       properties:
-        id:
+        userId:
           type: integer
         username:
           type: string
@@ -367,7 +576,7 @@ components:
       type: object
       description: Student profile
       properties:
-        id:
+        studentId:
           type: integer
         user:
           $ref: '#/components/schemas/User'
@@ -385,6 +594,10 @@ components:
           type: string
         standing:
           type: string
+        major1:
+          type: string
+        major2:
+          type: string
         location:
           $ref: '#/components/schemas/Location'
     Student:
@@ -394,10 +607,6 @@ components:
       properties:
         profile:
           $ref: '#/components/schemas/StudentProfile'
-        majors:
-          type: array
-          items:
-            type: string
         skills:
           type: array
           items:
@@ -407,7 +616,7 @@ components:
       type: object
       description: Project details
       properties:
-        id:
+        projectId:
           type: integer
         owner:
           $ref: '#/components/schemas/StudentProfile'
@@ -467,7 +676,7 @@ components:
       type: object
       description: Contract between student and NPO client for a project
       properties:
-        id:
+        contractId:
           type: integer
         project:
           $ref: '#/components/schemas/ProjectDetails'
@@ -487,44 +696,3 @@ components:
             - Completed
             - Halted
             - Deleted
-    Client:
-      title: Client
-      type: object
-      properties:
-        id:
-          type: integer
-        npo:
-          $ref: '#/components/schemas/NPO'
-        firstName:
-          type: string
-        lastName:
-          type: string
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-        joinedAt:
-          type: string
-          format: date
-        profile_img:
-          type: string
-          format: uri
-      description: NPO representative
-    NPO:
-      title: NPO
-      type: object
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        description:
-          type: string
-        website:
-          type: string
-          format: uri
-        profile_img:
-          type: string
-          format: uri
-      description: Non-profit organization
